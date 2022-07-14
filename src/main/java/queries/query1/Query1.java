@@ -20,19 +20,19 @@ public class Query1 {
                 .filter(line -> line.getSensor_id()<10000)
                 .keyBy(Sensor::getSensor_id);
 
-        /*
+
         DataStreamSink<String> oneHourStream = keyedStream
                 .window(TumblingEventTimeWindows.of(Time.hours(1)))
-                .aggregate(new AvgAggregate(),
+                .aggregate(new Q1Aggregate(),
                         new Q1ProcessWindowFunction())
-                .map((MapFunction<ResultQuery1, String>) myOutput -> ResultQuery1.writeQuery1Result(myOutput, "OneHour"))
-                .map(new MapFuncProva())
+                .map((MapFunction<Q1Result, String>) myOutput -> Q1Result.writeQuery1Result(myOutput, "OneHour"))
+                .map(new MyMetricMap())
                 .addSink(new FlinkKafkaProducer<String>(Configurations.TOPIC2,
                         new MyStringSerializationSchema(Configurations.TOPIC2),
                         getFlinkPropAsProducer(),
                         FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
 
-         */
+
 
 
 
@@ -42,22 +42,16 @@ public class Query1 {
          * io voglio che inizi il Sun May 01 00:00:00 CEST 2022, quindi 70 ore dopo il 28 Aprile alle 02:00
          */
 
-/*
+
         DataStreamSink<String> oneWeekStream = keyedStream
                 .window(TumblingEventTimeWindows.of(Time.hours(168), Time.hours(70)))
-               .aggregate(new AvgAggregate(), new Q1ProcessWindowFunction())
-                .map((MapFunction<ResultQuery1, String>) myOutput -> ResultQuery1.writeQuery1Result(myOutput, "OneWeek"))
-                .map(new MapFuncProva())
+               .aggregate(new Q1Aggregate(), new Q1ProcessWindowFunction())
+                .map((MapFunction<Q1Result, String>) myOutput -> Q1Result.writeQuery1Result(myOutput, "OneWeek"))
+                .map(new MyMetricMap())
                 .addSink(new FlinkKafkaProducer<String>(Configurations.TOPIC2,
                         new MyStringSerializationSchema(Configurations.TOPIC2),
                         getFlinkPropAsProducer(),
                         FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
-
- */
-
-
-
-
 
 
 
@@ -65,14 +59,11 @@ public class Query1 {
                 .window(TumblingEventTimeWindows.of(Time.days(31), Time.hours(406)))
                 .aggregate(new Q1Aggregate(), new Q1ProcessWindowFunction())
                 .map((MapFunction<Q1Result, String>) myOutput -> Q1Result.writeQuery1Result(myOutput, "AllDataset"))
-                .map(new MyMetricSink())
+                .map(new MyMetricMap())
                 .addSink(new FlinkKafkaProducer<String>(Configurations.TOPIC2,
                         new MyStringSerializationSchema(Configurations.TOPIC2),
                         getFlinkPropAsProducer(),
                         FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
-
-
-
 
 
         System.out.println("----sto in runQuery1");
