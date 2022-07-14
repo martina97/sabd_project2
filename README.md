@@ -6,7 +6,7 @@ Per eseguire l'applicazione, far partire i container tramite lo script "start-do
 ```
 sudo docker exec -t -i jobmanager /bin/bash
 ```
-es eseguire:
+ed eseguire:
 ```
 "flink run -c connectionToKafka.MyConsumer ./queries/sabd_project2-1.0-SNAPSHOT-jar-with-dependencies.jar".
 ```
@@ -14,3 +14,4 @@ Per generare la jar, eseguire il comando
 ```
 mvn compile assembly:single
 ```
+Una volta fatto partire il Consumer, eseguire tramite maven la il main della classe MyKafkaProducer.java, contenuta all'interno della directory https://github.com/martina97/sabd_project2/tree/master/src/main/java/kafka.
