@@ -29,7 +29,7 @@ public class Query2 {
                 .process(new Q2ProcessWindowFunction())
                 //.map((MapFunction<String, String>) myOutput -> Q2Result.writeQuery2Result(myOutput, "OneHour"))
                 .map(new MyMetricSink())
-                //.addSink(new MetricSink());
+                //.addSink(new MyMetricMap());
                 .addSink(new FlinkKafkaProducer<String>(Configurations.TOPIC2,
                         new MyStringSerializationSchema(Configurations.TOPIC2),
                         getFlinkPropAsProducer(),
@@ -42,7 +42,7 @@ public class Query2 {
                 .windowAll(TumblingEventTimeWindows.of(Time.days(1),Time.hours(+22)))
                 .process(new Q2ProcessWindowFunction())
                 //.map((MapFunction<String, String>) myOutput -> Q2Result.writeQuery2Result(myOutput, "OneDay"))
-                .map(new MyMetricSink())
+                .map(new MyMetricMap())
                 .addSink(new FlinkKafkaProducer<String>(Configurations.TOPIC2,
                         new MyStringSerializationSchema(Configurations.TOPIC2),
                         getFlinkPropAsProducer(),
@@ -58,7 +58,7 @@ public class Query2 {
                 .windowAll(TumblingEventTimeWindows.of(Time.hours(168), Time.hours(70)))
                 .process(new Q2ProcessWindowFunction())
                 //.map((MapFunction<String, String>) myOutput -> Q2Result.writeQuery2Result(myOutput, "OneWeek"))
-                .map(new MyMetricSink())
+                .map(new MyMetricMap())
                 .addSink(new FlinkKafkaProducer<String>(Configurations.TOPIC2,
                         new MyStringSerializationSchema(Configurations.TOPIC2),
                         getFlinkPropAsProducer(),
