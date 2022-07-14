@@ -1,21 +1,19 @@
 package queries.query1;
 
-import utilities.Configurations;
-
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class ResultQuery1 {
+public class Q1Result {
 
     private Integer sensorID;
     private Double avg_temperature;
     private Long count;
     private Date timestamp;
 
-    public ResultQuery1(Integer sensorID, Double temperature, Long occurrences) {
+    public Q1Result(Integer sensorID, Double temperature, Long occurrences) {
         this.sensorID = sensorID;
         this.avg_temperature = temperature;
         this.count = occurrences;
@@ -64,10 +62,8 @@ public class ResultQuery1 {
         this.timestamp = timestamp;
     }
 
-    public static String writeQuery1Result(ResultQuery1 myOutput, String evenTime) throws FileNotFoundException {
+    public static String writeQuery1Result(Q1Result myOutput, String evenTime) throws FileNotFoundException {
         //ts, sensor_id, count, avg_temperature
-
-
 
         StringBuilder sb = new StringBuilder();
         Date timestamp = myOutput.getTimestamp();
@@ -80,25 +76,21 @@ public class ResultQuery1 {
         sb.append(myOutput.getCount());
         sb.append(",");
         sb.append(myOutput.getAvg_temperature());
-        //sb.append("\n");
-
-
 
         return sb.toString();
 
     }
 
 
-    public static String writeQuery1Result_2(ResultQuery1 myOutput, String evenTime) throws FileNotFoundException {
+    public static String writeQuery1ResultCSV(Q1Result myOutput, String evenTime) throws FileNotFoundException {
         //ts, sensor_id, count, avg_temperature
 
-        String outputPath = "./Results/"+ Configurations.datasetPath+"_"+evenTime+"_QUERY1.csv";
-        System.out.println("outputPath: "+outputPath);
+        String outputPath = "./Results/"+ "QUERY1_"+evenTime+".csv";
+        //System.out.println("outputPath: "+outputPath);
         PrintWriter writer = new PrintWriter(new FileOutputStream(outputPath, true));
 
         StringBuilder sb = new StringBuilder();
         Date timestamp = myOutput.getTimestamp();
-        //SimpleDateFormat simpleDateFormat = new SimpleDateFormat(("yyyy-MM-dd"));
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         sb.append(simpleDateFormat.format(timestamp));
         sb.append(",");

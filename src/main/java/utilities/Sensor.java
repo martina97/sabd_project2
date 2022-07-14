@@ -30,14 +30,14 @@ public class Sensor {
             for (Cell cell : grid) {
                 // System.out.println("cell ---> " + cell);
                 if ( cell.getLat2()<lat && lat <cell.getLat1() && cell.getLon1()<lon && lon < cell.getLon2()) {
-                    System.out.println("la cella per il sensore " + sensor_id + " ==  " + cell.getIdCell());
+                    //System.out.println("la cella per il sensore " + sensor_id + " ==  " + cell.getIdCell());
                     this.cell = cell;
                     break;
                 }
             }
         }
         else {
-            System.out.println("CELLA NON VALIDA");
+           // System.out.println("CELLA NON VALIDA");
             this.cell = null;
         }
 

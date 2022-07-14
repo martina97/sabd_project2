@@ -26,7 +26,6 @@ public class MyKafkaProducer {
 
     public static Producer<String, String> createProducer() {
         Properties props = new Properties();
-        //props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, Configurations.KAFKA_BROKERS);
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(ProducerConfig.CLIENT_ID_CONFIG, "KafkaProducer");
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
@@ -53,13 +52,9 @@ public class MyKafkaProducer {
             FileStream.skip(1).forEach(line -> {
 
 
-
-                //   System.out.println("------------------------START----------------------");
-
                 String[] fields = line.split(";");
                 String[] value = Arrays.copyOfRange(fields, 0, fields.length);
                 String tsCurrent = value[5];    //timestamp linea corrente (in lettura)
-                // System.out.println("value.length --> " + value.length);
 
 
                 Long date = null;
@@ -68,17 +63,10 @@ public class MyKafkaProducer {
                 } catch (ParseException ignored) { }
 
 
-                // System.out.println("line: " + line);
-
-
                 String dateStrKey = String.valueOf(date);
-                // System.out.println("date == " + date + ", dateStrKey == " + dateStrKey);
 
-
-                // System.out.println("aaa");
                 //invio dei messaggi
                 ProducerRecord<String, String> CsvRecord = new ProducerRecord<>( Configurations.TOPIC1, 0, date, dateStrKey, line);
-                //   System.out.println("bbb");
 
 
 
@@ -87,10 +75,11 @@ public class MyKafkaProducer {
                     if (tsProva.get() != -1) {
                         // replay
                         Long diffTS = date - tsProva.get();
+                        // di solito intorno ai 1000/2000/3000/6000/70000 ms
                         System.out.println("diffTS == " + diffTS);
 
                         try {
-                            Thread.sleep(diffTS);
+                            Thread.sleep(diffTS/10);
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }

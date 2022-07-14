@@ -10,20 +10,18 @@ si trovano all'interno di quella cella
  */
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
-import queries.query1.ResultQuery1;
-import utilities.Cell;
-import utilities.MapFuncProva;
-import utilities.Sensor;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
+import utilities.*;
 
 
 import java.util.ArrayList;
-import java.util.TreeMap;
+
+import static kafka.MyKafkaProducer.getFlinkPropAsProducer;
 
 public class Query3 {
 
@@ -33,50 +31,54 @@ public class Query3 {
 
         KeyedStream<Sensor, String> keyedStream = stream
                 .filter(line -> line.getCell() != null)
-                .keyBy(line -> {
-                   // System.out.println("line.getCell() ----- " + line.getCell().getIdCell());
-                    return line.getCell().getIdCell();
-                });
+                .keyBy(line -> line.getCell().getIdCell());
 
 
-
-
-
+/*
         DataStreamSink<String> oneHourStream = keyedStream
                 .window(TumblingEventTimeWindows.of(Time.hours(1)))
                 .aggregate(new Q3Aggregate())
                 .windowAll(TumblingEventTimeWindows.of(Time.hours(1)))
                 .process(new Q3ProcessWindowFunction())
-
-
                 .map((MapFunction<Q3WindowResult, String>) myOutput -> Q3WindowResult.writeQuery3Result(myOutput, "OneHour"))
                 .map(new MapFuncProva())
+                //.map(new QueryLatencyTracker())
+                .addSink(new FlinkKafkaProducer<String>(Configurations.TOPIC2,
+                        new MyStringSerializationSchema(Configurations.TOPIC2),
+                        getFlinkPropAsProducer(),
+                        FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
 
 
-                .print();
-
-
-        /*
 
         DataStreamSink<String> oneDayStream = keyedStream
                 .window(TumblingEventTimeWindows.of(Time.days(1),Time.hours(+22)))
-                .aggregate(new Q3Aggregate(),
-                        new Q3ProcessWindowFunction())
-                .map((MapFunction<Q3Result, String>) myOutput -> Q3Result.writeQuery3Result(myOutput, "OneHour"))
+                .aggregate(new Q3Aggregate())
+                .windowAll(TumblingEventTimeWindows.of(Time.days(1),Time.hours(+22)))
+                .process(new Q3ProcessWindowFunction())
+                .map((MapFunction<Q3WindowResult, String>) myOutput -> Q3WindowResult.writeQuery3Result(myOutput, "OneHour"))
                 .map(new MapFuncProva())
-                .print();
+                .addSink(new FlinkKafkaProducer<String>(Configurations.TOPIC2,
+                        new MyStringSerializationSchema(Configurations.TOPIC2),
+                        getFlinkPropAsProducer(),
+                        FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
+
+ */
+
+
+
 
 
         DataStreamSink<String> oneWeekStream = keyedStream
                 .window(TumblingEventTimeWindows.of(Time.hours(168), Time.hours(70)))
-                .aggregate(new Q3Aggregate(),
-                        new Q3ProcessWindowFunction())
-                .map((MapFunction<Q3Result, String>) myOutput -> Q3Result.writeQuery3Result(myOutput, "OneHour"))
-                .map(new MapFuncProva())
-                .print();
-
-         */
-
+                .aggregate(new Q3Aggregate())
+                .windowAll(TumblingEventTimeWindows.of(Time.hours(168), Time.hours(70)))
+                .process(new Q3ProcessWindowFunction())
+                .map((MapFunction<Q3WindowResult, String>) myOutput -> Q3WindowResult.writeQuery3Result(myOutput, "OneHour"))
+                .map(new MyMetricSink())
+                .addSink(new FlinkKafkaProducer<String>(Configurations.TOPIC2,
+                        new MyStringSerializationSchema(Configurations.TOPIC2),
+                        getFlinkPropAsProducer(),
+                        FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
 
 
         System.out.println("----sto in runQuery3");
@@ -86,13 +88,18 @@ public class Query3 {
 
     public static ArrayList<Cell> createGrid() {
         /*
-        (58,2) --- (58,9) --- (58,16) --- (58,23) --- (58,30)
-           ╎          ╎          ╎           ╎           ╎
-        (53,2) --- (53,9) --- (53,16) --- (53,23) --- (53,30)
-           ╎          ╎          ╎           ╎           ╎
-        (48,2) --- (48,9) --- (48,16) --- (48,23) --- (48,30)
-           ╎          ╎          ╎           ╎           ╎
-        (38,2) --- (38,9) --- (38,16) --- (38,23) --- (38,30)
+
+        (58,2) -------- (58,9) -------- (58,16) -------- (58,23) -------- (58,30)
+           ╎   cell_0     ╎     cell_1      ╎     cell_2    ╎      cell_3    ╎
+        (53,2) -------- (53,9) -------- (53,16) -------- (53,23) -------- (53,30)
+           ╎   cell_4     ╎     cell_5      ╎     cell_6     ╎      cell_7   ╎
+        (48,2) -------- (48,9) -------- (48,16) -------- (48,23) -------- (48,30)
+           ╎   cell_8     ╎     cell_9      ╎     cell_10    ╎     cell_11   ╎
+        (43,2) -------- (43,9) -------- (43,16) -------- (43,23) -------- (48,30)
+           ╎   cell_12    ╎    cell_13     ╎     cell_14    ╎     cell_15    ╎
+        (38,2) -------- (38,9) -------- (38,16) -------- (38,23) -------- (38,30)
+
+
         */
         ArrayList<Cell> grid = new ArrayList<>();
         Double lat1 = 58.000;

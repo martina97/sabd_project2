@@ -1,17 +1,11 @@
 package queries.query2;
 
 import org.apache.flink.api.common.functions.AggregateFunction;
-import queries.query1.AccumulatorQuery1;
-import queries.query1.ResultQuery1;
 import utilities.Sensor;
 
 public class Q2Aggregate implements AggregateFunction<Sensor, Q2Accumulator, Q2Result> {
     @Override
     public Q2Accumulator createAccumulator() {
-        //viene chiamato 1 volta per window (la prima volta che c'è un record di quella window)
-
-        //istant now
-        //get result faccio diff
         return new Q2Accumulator();
     }
 

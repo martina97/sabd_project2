@@ -19,106 +19,46 @@ import java.time.Duration;
 import java.util.Properties;
 
 public class MyKafkaConsumer {
-    //static ArrayList<Cell> grid;
     public static void main(String[] args) throws Exception {
-
-        /*
-        System.out.println(" ---- prima grid ---- ");
-        ArrayList<Cell> grid = Query3.createGrid();
-        System.out.println(" ---- dopo grid ---- ");
-
-        System.out.println("grid ==== " + grid);
-
-         */
 
         FlinkKafkaConsumer<String> consumer = createConsumer();
         consumer.assignTimestampsAndWatermarks(WatermarkStrategy.forBoundedOutOfOrderness(Duration.ofMinutes(1)));
+
         StreamExecutionEnvironment env = createEnviroment();
 
-
-
         //creo lo stream di tipo "Sensor" andando a splittare le righe
-        //che vengono lette dal topic di kafka da parte del consumer con MyMapFunction
+        //che vengono lette dal topic di kafka dal consumer
         DataStream<Sensor> stream = env.addSource(consumer)
                 .setParallelism(1)
-                .map(new MapFunction<String, Sensor>() {
-                    @Override
-                    public Sensor map(String line) throws Exception {
-                        String[] values = line.split(";");
-                        System.out.println("line DENTRO MAP== " + line);
+                .map((MapFunction<String, Sensor>) line -> {
+                    String[] values = line.split(";");
 
-                        //ArrayList<Cell> grid2 = grid;
+                    Sensor sensor = new Sensor(Integer.valueOf(values[0]),
+                            values[1],
+                            Long.valueOf(values[2]),
 
-                        Sensor sensor = new Sensor(Integer.valueOf(values[0]),
-                                values[1],
-                                Long.valueOf(values[2]),
-                                //Double.valueOf(values[3]),
-                                //Double.valueOf(values[4]),
-                                Sensor.checkOutliersLatLon(values[3]),
-                                Sensor.checkOutliersLatLon(values[4]),
-                                values[5],
-                                Double.valueOf(values[6]),
-                                Double.valueOf(values[9]));
+                            Sensor.checkOutliersLatLon(values[3]),
+                            Sensor.checkOutliersLatLon(values[4]),
+                            values[5],
+                            Double.valueOf(values[6]),
+                            Double.valueOf(values[9]));
 
-        /*
-        System.out.println("sensor id  =  " + sensor.getSensor_id() + ", sensor type = " + sensor.getSensor_type() + " location =" + sensor.getLocation() +
-               " lat = " + sensor.getLat() + ", lon = " + sensor.getLon() + ", timestamp = " + sensor.getTimestamp() + ", pressure = " + sensor.getPressure() +
-                ", altitude = " + sensor.getAltitude() + ", pressure_sealevel = " + sensor.getPressure_sealevel() + ", temperature = " + sensor.getTemperature());
-        */
-                        System.out.println(sensor);
-                        //System.out.println(" ------ SONO IN MY MAP ----");
-                        //System.out.println("grid ======== " + grid2);
-                        sensor.setCell();
-                        return sensor;
-                    }
+                    sensor.setCell();
+                    return sensor;
                 })
                 .filter(sensor -> sensor.getTemperature()>-40.0 && sensor.getTemperature()<85.0);
 
 
-
-
-
-        //Query1.runQuery1(stream);
-        //Query2.runQuery2(stream);
+        Query1.runQuery1(stream);
+        Query2.runQuery2(stream);
         Query3.runQuery3(stream);
 
         env.setParallelism(3);
+        env.getConfig().setLatencyTrackingInterval(1000);
         env.execute("sabd2");
 
 
     }
-    /*
-    public static class MyMapFunc implements MapFunction<String, ArrayList<Cell> , Sensor> {
-
-
-        @Override
-        public Sensor map(String line,  ArrayList<Cell> grid) throws Exception {
-
-            String[] values = line.split(";");
-            System.out.println("line DENTRO MAP== " + line);
-
-            Sensor sensor = new Sensor(Integer.valueOf(values[0]),
-                    values[1],
-                    Long.valueOf(values[2]),
-                    //Double.valueOf(values[3]),
-                    //Double.valueOf(values[4]),
-                    Sensor.checkOutliersLatLon(values[3]),
-                    Sensor.checkOutliersLatLon(values[4]),
-                    values[5],
-                    Double.valueOf(values[6]),
-                    Double.valueOf(values[9]));
-
-
-            System.out.println(sensor);
-            System.out.println(" ------ SONO IN MY MAP ----");
-            System.out.println("grid ======== " + grid);
-            sensor.setCell(grid);
-            return sensor;
-        }
-
-    }
-
-     */
 
     public static FlinkKafkaConsumer<String> createConsumer() throws Exception {
         // creazione properties
@@ -131,30 +71,6 @@ public class MyKafkaConsumer {
 
         // creazione consumer usando le properties
         FlinkKafkaConsumer<String> myConsumer = new FlinkKafkaConsumer<>(Configurations.TOPIC1, new SimpleStringSchema(), props);
-
-   /*
-        FlinkKafkaConsumer<String> myConsumer = new FlinkKafkaConsumer<>(Configurations.TOPIC1, new SimpleStringSchema() {
-            private static final long serialVersionUID = 1L;
-            private final String SHUTDOWN = "SHUTDOWN";
-
-            @Override
-            public String deserialize(byte[] message) {
-
-                return super.deserialize(message);
-            }
-
-            @Override
-            public boolean isEndOfStream(String nextElement) {
-                if (SHUTDOWN.equalsIgnoreCase(nextElement)) {
-                    System.out.println("cccccccccccccccc");
-                    return true;
-                }
-                System.out.println("aaaaaaaaaaaaaaaa");
-                return super.isEndOfStream(nextElement);
-            }
-        } , props);
-
-    */
 
 
         System.out.println("---creato consumer--");

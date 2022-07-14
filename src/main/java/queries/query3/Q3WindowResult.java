@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 public class Q3WindowResult {
@@ -22,7 +23,45 @@ public class Q3WindowResult {
     }
 
     public static String writeQuery3Result(Q3WindowResult myOutput, String evenTime) throws FileNotFoundException {
-        String outputPath = "./Results/"+ Configurations.datasetPath+"_"+evenTime+"_QUERY3.csv";
+
+        StringBuilder sb = new StringBuilder();
+        Date timestamp = myOutput.getTimestamp();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        sb.append(simpleDateFormat.format(timestamp));
+
+        sb.append(",");
+
+
+        TreeMap<Integer, Tuple2<Double,Double>> cells = myOutput.getCells();
+        Set<Integer> boh = cells.keySet();
+
+        for (int j=0; j<16; j++) {
+            if (!boh.contains(j)) {
+                cells.put(j,new Tuple2<>(0.0,0.0));
+            }
+        }
+
+
+        for (Map.Entry<Integer, Tuple2<Double,Double>> entry : cells.entrySet()) {
+
+                sb.append(entry.getKey());
+                sb.append(",");
+                sb.append(entry.getValue().f0);
+                sb.append(",");
+                sb.append(entry.getValue().f1);
+            // sb.append(",");
+
+
+            }
+
+        return sb.toString();
+
+
+    }
+
+
+    public static String writeQuery3ResultCSV(Q3WindowResult myOutput, String evenTime) throws FileNotFoundException {
+        String outputPath = "./Results/QUERY3_"+evenTime+".csv";
         System.out.println("outputPath: "+outputPath);
         //System.out.println("SONO IN WRITE QUERY2 ------ \n line === " + myOutput);
 
@@ -38,7 +77,17 @@ public class Q3WindowResult {
 
 
         TreeMap<Integer, Tuple2<Double,Double>> cells = myOutput.getCells();
+        Set<Integer> boh = cells.keySet();
+
+        for (int j=0; j<16; j++) {
+            if (!boh.contains(j)) {
+                cells.put(j,new Tuple2<>(0.0,0.0));
+            }
+        }
+
+
         for (Map.Entry<Integer, Tuple2<Double,Double>> entry : cells.entrySet()) {
+
             sb.append(entry.getKey());
             sb.append(",");
             sb.append(entry.getValue().f0); //todo: temp?
@@ -50,9 +99,9 @@ public class Q3WindowResult {
                 sb.append("\n");
             }
 
-
-
         }
+
+
 
         writer.write(sb.toString());
         writer.flush();
