@@ -1,4 +1,4 @@
-# Sistemi e Architetture per Big Data - AA 2021/2011
+# Sistemi e Architetture per Big Data - AA 2021/2022
 
 Lo scopo del progetto è rispondere ad alcune query riguardanti un dataset reale relativo a dati ambientali, provenienti da sensori messi a disposizione da Sensor.Community, una rete di sensori globale che ha l’obiettivo di fornire open data di tipo ambientale. Il dataset relativo ai dati ambientali contiene in particolare i valori di temperatura, altitudine e pressione misurati da sensori di tipo BMP180. Il dataset è fornito in formato CSV, con i campi separati dal carattere ; ed è disponibile all’indirizzo https://archive.sensor.community/csv_per_month/2022-05/2022-05_bmp180.zip.
 
