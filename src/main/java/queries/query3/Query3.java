@@ -34,14 +34,14 @@ public class Query3 {
                 .keyBy(line -> line.getCell().getIdCell());
 
 
-/*
+
         DataStreamSink<String> oneHourStream = keyedStream
                 .window(TumblingEventTimeWindows.of(Time.hours(1)))
                 .aggregate(new Q3Aggregate())
                 .windowAll(TumblingEventTimeWindows.of(Time.hours(1)))
                 .process(new Q3ProcessWindowFunction())
                 .map((MapFunction<Q3WindowResult, String>) myOutput -> Q3WindowResult.writeQuery3Result(myOutput, "OneHour"))
-                .map(new MapFuncProva())
+                .map(new MyMetricMap())
                 //.map(new QueryLatencyTracker())
                 .addSink(new FlinkKafkaProducer<String>(Configurations.TOPIC2,
                         new MyStringSerializationSchema(Configurations.TOPIC2),
@@ -56,16 +56,11 @@ public class Query3 {
                 .windowAll(TumblingEventTimeWindows.of(Time.days(1),Time.hours(+22)))
                 .process(new Q3ProcessWindowFunction())
                 .map((MapFunction<Q3WindowResult, String>) myOutput -> Q3WindowResult.writeQuery3Result(myOutput, "OneHour"))
-                .map(new MapFuncProva())
+                .map(new MyMetricMap())
                 .addSink(new FlinkKafkaProducer<String>(Configurations.TOPIC2,
                         new MyStringSerializationSchema(Configurations.TOPIC2),
                         getFlinkPropAsProducer(),
                         FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
-
- */
-
-
-
 
 
         DataStreamSink<String> oneWeekStream = keyedStream
@@ -74,7 +69,7 @@ public class Query3 {
                 .windowAll(TumblingEventTimeWindows.of(Time.hours(168), Time.hours(70)))
                 .process(new Q3ProcessWindowFunction())
                 .map((MapFunction<Q3WindowResult, String>) myOutput -> Q3WindowResult.writeQuery3Result(myOutput, "OneHour"))
-                .map(new MyMetricSink())
+                .map(new MyMetricMap())
                 .addSink(new FlinkKafkaProducer<String>(Configurations.TOPIC2,
                         new MyStringSerializationSchema(Configurations.TOPIC2),
                         getFlinkPropAsProducer(),
